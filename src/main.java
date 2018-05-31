@@ -17,6 +17,7 @@ public class main {
         boolean checkHand = false;
         boolean endgame = true;
         double rate = ((double)wins/game) * 100;
+        boolean check = true;
 
         Scanner input = new Scanner(System.in);
 
@@ -27,8 +28,19 @@ public class main {
         System.out.println("Welcome to Black Jack V.2.");
 
         while(true){
-            System.out.print(" Bank: " + bank + "\nPlease enter your starting bid: $");
-            bid = input.nextInt();
+                check = true;
+
+            while(check) {
+                System.out.print(" Bank: " + bank + "\nPlease enter your starting bid: $");
+                bid = input.nextInt();
+
+                if (bid > bank) {
+                    System.out.println("Not enough money in bank to bid, please try again!");
+                }
+                else {
+                    check = false;
+                }
+            }
             System.out.printf("GAME #%d", game);
             System.out.println();
             endgame = true;
@@ -37,55 +49,59 @@ public class main {
             System.out.println("Hands: " + playerHand);
 
             while(endgame){
+                try {
+                    System.out.println("\n1.Hit\t2.Hold\n3.Status\t4.quit");
+                    decision = input.nextInt();
 
-                System.out.println("\n1.Hit\t2.Hold\n3.Status\t4.quit");
-                decision = input.nextInt();
-
-                switch(decision) {
-                    case 1:
-                        playerHand += control.hit();
-                        dealerHand += control.dealerhit();
-                        System.out.println("Hands: " + playerHand);
-                        checkHand = control.check(playerHand);
-                        if (checkHand) {
-                            playerHand = dealerHand = 0;
+                    switch (decision) {
+                        case 1:
+                            playerHand += control.hit();
+                            dealerHand += control.dealerhit();
+                            System.out.println("Hands: " + playerHand);
+                            checkHand = control.check(playerHand);
+                            if (checkHand) {
+                                playerHand = dealerHand = 0;
+                                control.resetDeck();
+                                lose++;
+                                game++;
+                                endgame = false;
+                            }
+                            break;
+                        case 2:
+                            holdGame = control.hold(playerHand, dealerHand);
+                            if (holdGame) {
+                                wins++;
+                                game++;
+                                bank = bank + bid;
+                                playerHand = dealerHand = 0;
+                                endgame = false;
+                            } else {
+                                lose++;
+                                game++;
+                                bank = bank - bid;
+                                playerHand = dealerHand = 0;
+                                endgame = false;
+                            }
                             control.resetDeck();
-                            lose++;
-                            game++;
-                            endgame = false;
-                        }
-                        break;
-                    case 2:
-                        holdGame = control.hold(playerHand, dealerHand);
-                        if (holdGame) {
-                            wins++;
-                            game++;
-                            bank = bank + bid;
-                            playerHand = dealerHand = 0;
-                            endgame = false;
-                        } else {
-                            lose++;
-                            game++;
-                            bank = bank - bid;
-                            playerHand = dealerHand = 0;
-                            endgame = false;
-                        }
-                        control.resetDeck();
-                        break;
+                            break;
 
-                    case 3:
-                        System.out.printf("Bank: %d \t Bid: %d \nWins: %d\t Total Games: %d\n Success: %.f", bank, bid, wins, game, rate);
-                        break;
+                        case 3:
+                            System.out.printf("Bank: %d \t Bid: %d \nWins: %d\t Total Games: %d\n Success: %.f", bank, bid, wins, game, rate);
+                            break;
 
-                    case 4:
-                        System.exit(1);
-                        break;
+                        case 4:
+                            System.exit(1);
+                            break;
 
-                    default:
-                        System.out.println("IMPROPER ENTRY! TRY AGAIN!!!");
-                        break;
+                        default:
+                            System.out.println("IMPROPER ENTRY! TRY AGAIN!!!");
+                            break;
+                    }
                 }
-
+                catch( Exception e){
+                    System.out.println("Improper Entry! please try again");
+                    input.nextInt();
+                }
 
             }
 
